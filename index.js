@@ -92,11 +92,12 @@ app.post("/createCard",jsonParser, (req,res) => {
 })
 
 
-app.get("/getCardById/:id", (req,res) => {
-    var id = req.params.id;
+app.get("/getCardById/:id", (request,response) => {
+    var id = request.params.id;
     pgClient.query('SELECT * FROM cards WHERE id = '+id+'')
-    .then( res => {
-        console.log(res);
+    .then( data => {
+        console.log(data.rows[0]);
+        response.send(data.rows[0])
     })
     .catch( err => {
         console.log(err);
