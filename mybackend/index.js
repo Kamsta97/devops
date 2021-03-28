@@ -1,6 +1,7 @@
 const express =require("express");
 const cors = require('cors')
 var bodyParser = require('body-parser')
+const { v4: uuidv4 } = require('uuid');
 const app = express();
 
 app.use(cors());
@@ -37,32 +38,16 @@ pgClient.connect(err => {
     } else {
         console.log('connected')
 
-        pgClient.query('DROP TABLE IF EXISTS numbers')
-            .catch( (err) => {
-            console.log(err);
-        })
-
-        pgClient.query('CREATE TABLE numbers (i integer);')
-            .catch( (err) => {
-            console.log(err);
-        })
-
-        pgClient.query('INSERT INTO numbers (i) VALUES (1),(2),(3);')
-            .catch( (err) => {
-            console.log(err);
-        })
-
         pgClient.query(`
             CREATE TABLE IF NOT EXISTS cards
             (
-                id SERIAL NOT NULL,
+                id varchar(255) NOT NULL,
                 name varchar(40) NOT NULL,
                 surname varchar(40) NOT NULL,
                 overall integer NOT NULL,
                 rare boolean NOT NULL,
                 club varchar(40) NOT NULL,
-                nationality varchar(40) NOT NULL,
-                CONSTRAINT cards_pkey PRIMARY KEY (id)
+                nationality varchar(40) NOT NULL
             )
         `)
             .catch( (err) => {
@@ -77,7 +62,8 @@ app.get("/", (req, res) => {
 });
 
 app.post("/createCard",jsonParser, (req,res) => {
-    let query = `INSERT INTO cards (name,surname,overall,rare,club,nationality) VALUES (
+    let query = `INSERT INTO cards (id,name,surname,overall,rare,club,nationality) VALUES (
+        '${uuidv4()}',
         '${req.body.name}',
         '${req.body.surname}',
         ${parseInt(req.body.overall)},
@@ -94,16 +80,26 @@ app.post("/createCard",jsonParser, (req,res) => {
     })
 })
 
-
-app.get("/getCardById/:id", (request,response) => {
-    var id = request.params.id;
-    pgClient.query('SELECT * FROM cards WHERE id = '+id+'')
-    .then( data => {
-        console.log(data.rows[0]);
-        response.send(data.rows[0])
-    })
-    .catch( err => {
-        console.log(err);
+app.get("/getCardById/:name/:surname", (req,res) => {
+    var name = req.params.name;
+    var surname = req.params.surname;
+    redisClient.get(name+surname, async (err , data) => {
+        if (data) {
+            return res.status(200).send({
+                error: false,
+                msg: `This data is from catch`,
+                data: JSON.parse(data)
+              })
+        } else {
+            pgClient.query(`SELECT * FROM cards WHERE name = '${name}' AND surname = '${surname}'`)
+            .then( data => {
+                redisClient.setex(name+surname, 600, JSON.stringify(data.rows));
+                res.status(200).json(data.rows)
+            })
+            .catch( err => {
+                console.log(err);
+            })
+        }
     })
 })
 
