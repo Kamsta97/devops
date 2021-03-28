@@ -14,6 +14,9 @@ const redisClient = redis.createClient({
     port: 6379,
    //retry_strategy: () => 1000
 })
+redisClient.on('error', (err) => {
+    console.log(err)
+})
 redisClient.on('connect', () => {
     console.log('connect to redis')
 })
