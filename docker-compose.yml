@@ -28,4 +28,13 @@ services:
           - POSTGRES_HOST=mypostgres
       ports: 
           - "8080:8080"
-
+  myfrontend:
+      restart: always
+      build:
+          dockerfile: dockerfile
+          context: ./myfrontend
+      volumes: 
+          - /opt/app/node_modules
+          - ./:/opt/app 
+      ports: 
+          - "3000:3000"
