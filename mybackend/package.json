@@ -16,5 +16,8 @@
   },
   "keywords": [],
   "author": "Kamil Stasiak",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "^2.8.10"
+  }
 }

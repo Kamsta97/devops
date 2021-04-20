@@ -3,7 +3,6 @@ const cors = require('cors')
 var bodyParser = require('body-parser')
 const { v4: uuidv4 } = require('uuid');
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 var jsonParser = bodyParser.json()
@@ -80,11 +79,12 @@ app.post("/createCard",jsonParser, (req,res) => {
     })
 })
 
-app.get("/getCardById/:name/:surname", (req,res) => {
+app.get("/getCardById/:name/:surname",cors(), (req,res) => {
     var name = req.params.name;
     var surname = req.params.surname;
     redisClient.get(name+surname, async (err , data) => {
-        if (data) {
+        console.log(data);
+        if (data != null && data != []) {
             return res.status(200).send({
                 error: false,
                 msg: `This data is from catch`,
@@ -102,6 +102,8 @@ app.get("/getCardById/:name/:surname", (req,res) => {
         }
     })
 })
+
+
 
 function StringToBool(value){
     res = false;
