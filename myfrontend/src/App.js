@@ -9,8 +9,7 @@ function App() {
     };
 
     //Get
-    const [name, setName] = useState('');
-    const [surname, setSurname] = useState('');
+    const [id,setId] = useState('');
 
     //Post
     const [addedName, setAddedName] = useState('');
@@ -21,10 +20,10 @@ function App() {
     const [addedNationality, setAddedNationality] = useState('');
 
     //Delete
-    const [deleteName, setDeleteName] = useState('');
-    const [deleteSurname, setDeleteSurname] = useState('');
+    const [deletedId, setDeletedId] = useState('');
 
     //Put
+    const [updatedId, setUpdatedId] = useState('');
     const [updatedName, setUpdatedName] = useState('');
     const [updatedSurname, setUpdatedSurname] = useState('');
     const [updatedOverall, setUpdatedOverall] = useState(0);
@@ -34,12 +33,8 @@ function App() {
 
     //Get
 
-    const onNameChange = (event) => {
-        setName(event.target.value);
-    }
-
-    const onSurnameChange = (event) => {
-        setSurname(event.target.value);
+    const onIdChange = (event) => {
+        setId(event.target.value);
     }
 
     //Post
@@ -61,7 +56,9 @@ function App() {
     }
 
     const onRareChange = (event) => {
-        setAddedRare(event.target.value);
+        console.log('on rare change');
+        console.log(event.target.checked)
+        setAddedRare(event.target.checked);
     }
 
     const onNationalityChange = (event) => {
@@ -70,15 +67,15 @@ function App() {
 
     //Delete
 
-    const onDeleteNameChange = (event) => {
-        setDeleteName(event.target.value);
-    }
-
-    const onDeleteSurnameChange = (event) => {
-        setDeleteSurname(event.target.value);
+    const onDeletedIdChange = (event) => {
+        setDeletedId(event.target.value);
     }
 
     //Put
+
+    const onUpdatedIdChange = (event) => {
+        setUpdatedId(event.target.value);
+    }
 
     const onUpdatedNameChange = (event) => {
         setUpdatedName(event.target.value);
@@ -97,7 +94,9 @@ function App() {
     }
 
     const onUpdatedRareChange = (event) => {
-        setUpdatedRare(event.target.value);
+        console.log('on rare update change');
+        console.log(event.target.checked )
+        setUpdatedRare(event.target.checked );
     }
 
     const onUpdatedNationalityChange = (event) => {
@@ -105,14 +104,13 @@ function App() {
     }
 
     const getPlayer = () => {
-        console.log(name+surname);
-        axios.get('http://localhost:8080/getCardById/'+name+'/'+surname+'' , config)
+        axios.get('http://localhost:4000/getCardById/'+id+'' , config)
             .then(response => console.log(response.data))
             .catch(error => console.log(error))
     }
 
     const addPlayer = () => {
-        axios.post('http://localhost:8080/createCard',
+        axios.post('http://localhost:4000/createCard',
         {
             name:        addedName,
             surname:     addedSurname,
@@ -126,14 +124,15 @@ function App() {
     }
 
     const deletePlayer = () => {
-        axios.delete('http://localhost:8080/delete/'+deleteName+'/'+deleteSurname+'',config)
+        axios.delete('http://localhost:4000/delete/'+deletedId+'',config)
         .then(response => console.log(response.data))
         .catch(error => console.log(error))
     }
 
     const updatePlayer = () => {
-        axios.put('http://localhost:8080/update/'+updatedName+'/'+updatedSurname+'',config,
+        axios.put('http://localhost:4000/update/'+updatedId+'',
         {
+            id:          updatedId,
             name:        updatedName,
             surname:     updatedSurname,
             overall:     updatedOverall,
@@ -141,18 +140,17 @@ function App() {
             club:        updatedClub,
             nationality: updatedNationality
         },config)
-        .then(response => console.log(updatedName + ' ' + updatedSurname + ' was added to db'))
+        .then(response => console.log('Card '+updatedName + ' ' + updatedSurname + ' was updated'))
         .catch(error => console.log(error));
     }
 
 
     return (
         <div>
-            {name+surname};
+            {id};
             <br></br>
             <h3>Getting playar card by name and surname</h3>
-            <input placeholder="Imię" value={name} onChange={onNameChange}/>
-            <input placeholder="Nazwisko" value={surname} onChange={onSurnameChange}/>
+            <input placeholder="ID" value={id} onChange={onIdChange}/>
             <button onClick={getPlayer}>
                 GET
             </button>
@@ -179,8 +177,7 @@ function App() {
             <br></br>
 
             <h3>Delete playar card by name and surname</h3>
-            <input placeholder="Imię" value={deleteName} onChange={onDeleteNameChange}/>
-            <input placeholder="Nazwisko" value={deleteSurname} onChange={onDeleteSurnameChange}/>
+            <input placeholder="Id" value={deletedId} onChange={onDeletedIdChange}/>
             <button onClick={deletePlayer}>
                 DELETE
             </button>
@@ -188,6 +185,8 @@ function App() {
             <br></br>
 
             <h3>Update playar card</h3>
+            <input placeholder="Id" value={updatedId} onChange={onUpdatedIdChange}/>
+            <br/>
             <input placeholder="Imię" value={updatedName} onChange={onUpdatedNameChange}/>
             <br/>
             <input placeholder="Nazwisko" value={updatedSurname} onChange={onUpdatedSurnameChange}/>

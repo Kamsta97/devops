@@ -27,7 +27,7 @@ services:
           - REDIS_HOST=myredis
           - POSTGRES_HOST=mypostgres
       ports: 
-          - "8080:8080"
+          - "4000:4000"
   myfrontend:
       restart: always
       build:

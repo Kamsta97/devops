@@ -76,60 +76,83 @@ app.post("/createCard",jsonParser, (req,res) => {
     })
     .catch( (err) => {
         console.log(err);
+        throw err;
     })
 })
 
-app.delete("/delete/:name/:surname", cors(), (req,res) => {
-    var name = req.params.name;
-    var surname = req.params.surname;
+app.delete("/delete/:id", cors(), (req,res) => {
+    var id = req.params.id;
     try {
-        pgClient.query(`DELETE FROM cards WHERE name = '${name}' AND surname = '${surname}'`, (error, results) => {
+        pgClient.query(`DELETE FROM cards WHERE id = '${id}'`, (error, results) => {
             if (error) {
-              throw error;
+                console.log(error);
+                throw error;
             }
-            response.status(201).send(`${name} ${surname} was deleted`);
+            res.status(200).send(`Card: ${id} was deleted`);
           })
     } catch (error) {
         console.log(error);
+        throw error;
     }
 })
 
-app.put("/update/:name/:surname", cors(), (req,res) => {
-    const {name, surname, overall, rare, club, nationality} = req.body
-    console.log(name);
-    console.log(surname);
-    pgClient.query('UPDATE cards SET overall = $3, rare = $4, club = $5, nationality = $6 where name = $1 and surname = $2', 
-    [name,surname,parseInt(overall),StringToBool(rare),club,nationality], (error, result) => {
+app.put("/update/:id", cors(), (req,res) => {
+    const {id,name, surname, overall, rare, club, nationality} = req.body
+    console.log(overall);
+    console.log(rare);
+    console.log(req.body);
+    pgClient.query(`UPDATE cards SET 
+    name='${name}',
+    overall = ${overall}, 
+    rare = ${rare}, 
+    club = '${club}', 
+    nationality = '${nationality}' 
+    where id = '${id}'`, 
+    (error, result) => {
         if (error) {
             console.log(error);
             throw error;
         }
-        response.status(200).send(`${name} ${surname} was updated`);
+        res.status(200).send(`Card ${name} ${surname} was updated`);
     });
 })
 
-app.get("/getCardById/:name/:surname",cors(), (req,res) => {
-    var name = req.params.name;
-    var surname = req.params.surname;
-    redisClient.get(name+surname, async (err , data) => {
-        console.log(data);
-        if (data.data) {
-            return res.status(200).send({
+app.get("/getCardById/:id",cors(), (req,res) => {
+    var id = req.params.id;
+    redisClient.exists(id, (error, result) => {
+        if (error) {
+          console.log(error);
+          throw error;
+        }
+    
+        if(result == 1) {
+          console.log("Data from redis");
+          redisClient.get(id, function(error, object) {
+            if(error) {
+                console.log(error);
+                throw error;
+            }
+            res.status(200).send({
                 error: false,
                 msg: `This data is from catch`,
-                data: JSON.parse(data)
-              })
+                data: JSON.parse(object)
+            })
+            //res.status(200).json(object);
+          })
         } else {
-            pgClient.query(`SELECT * FROM cards WHERE name = '${name}' AND surname = '${surname}'`)
+            console.log("Data from db")
+            pgClient.query(`SELECT * FROM cards WHERE id = '${id}'`)
             .then( data => {
-                redisClient.setex(name+surname, 600, JSON.stringify(data.rows));
-                res.status(200).json(data.rows)
+                console.log(JSON.stringify(data.rows));
+                 redisClient.setex(id, 600, JSON.stringify(data.rows));
+                 res.status(200).json(data.rows)
             })
             .catch( err => {
+                throw err;
                 console.log(err);
             })
-        }
-    })
+          }
+    });
 })
 
 
@@ -145,7 +168,7 @@ function StringToBool(value){
 }
 
 //PORT
-const PORT = 8080;
+const PORT = 4000;
 app.listen(PORT, () => {
     console.log('API listening on port '+PORT);
 });
