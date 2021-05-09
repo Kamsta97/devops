@@ -61,12 +61,13 @@ app.get("/", (req, res) => {
 });
 
 app.post("/createCard",jsonParser, (req,res) => {
+    console.log(req.body.rare);
     let query = `INSERT INTO cards (id,name,surname,overall,rare,club,nationality) VALUES (
         '${uuidv4()}',
         '${req.body.name}',
         '${req.body.surname}',
         ${parseInt(req.body.overall)},
-        ${StringToBool(req.body.rare)},
+        ${req.body.rare},
         '${req.body.club}',
         '${req.body.nationality}')`
     pgClient.query(query)

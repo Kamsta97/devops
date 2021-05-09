@@ -56,8 +56,6 @@ function App() {
     }
 
     const onRareChange = (event) => {
-        console.log('on rare change');
-        console.log(event.target.checked)
         setAddedRare(event.target.checked);
     }
 
@@ -94,9 +92,7 @@ function App() {
     }
 
     const onUpdatedRareChange = (event) => {
-        console.log('on rare update change');
-        console.log(event.target.checked )
-        setUpdatedRare(event.target.checked );
+        setUpdatedRare(event.target.checked);
     }
 
     const onUpdatedNationalityChange = (event) => {
@@ -110,6 +106,7 @@ function App() {
     }
 
     const addPlayer = () => {
+        console.log(addedRare);
         axios.post('http://localhost:4000/createCard',
         {
             name:        addedName,
@@ -130,6 +127,7 @@ function App() {
     }
 
     const updatePlayer = () => {
+        console.log(updatedRare);
         axios.put('http://localhost:4000/update/'+updatedId+'',
         {
             id:          updatedId,
@@ -164,7 +162,7 @@ function App() {
             <br/>
             <input placeholder="Ocena" value={addedOverall} onChange={onOverallChange}/>
             <br/>
-            <input type="checkbox" placeholder="Rzadkość" value={addedRare} onChange={onRareChange}/>
+            <input type="checkbox" placeholder="Rzadkość" checked={addedRare} onChange={onRareChange}/>
             <br/>
             <input placeholder="Club" value={addedClub} onChange={onClubChange}/>
             <br/>
@@ -193,7 +191,7 @@ function App() {
             <br/>
             <input placeholder="Ocena" value={updatedOverall} onChange={onUpdatedOverallChange}/>
             <br/>
-            <input type="checkbox" placeholder="Rzadkość" value={updatedRare} onChange={onUpdatedRareChange}/>
+            <input type="checkbox" placeholder="Rzadkość" checked={updatedRare} onChange={onUpdatedRareChange}/>
             <br/>
             <input placeholder="Club" value={updatedClub} onChange={onUpdatedClubChange}/>
             <br/>
