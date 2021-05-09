@@ -132,12 +132,7 @@ app.get("/getCardById/:id",cors(), (req,res) => {
                 console.log(error);
                 throw error;
             }
-            res.status(200).send({
-                error: false,
-                msg: `This data is from catch`,
-                data: JSON.parse(object)
-            })
-            //res.status(200).json(object);
+            res.status(200).json(JSON.parse(object));
           })
         } else {
             console.log("Data from db")

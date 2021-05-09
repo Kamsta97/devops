@@ -149,7 +149,7 @@ function App() {
         <div>
             {id};
             <br></br>
-            <h3>Getting playar card by name and surname</h3>
+            <h3>Getting playar card by id</h3>
             <input placeholder="ID" value={id} onChange={onIdChange}/>
             <button onClick={getPlayer}>
                 GET
@@ -176,7 +176,7 @@ function App() {
 
             <br></br>
 
-            <h3>Delete playar card by name and surname</h3>
+            <h3>Delete playar card by id</h3>
             <input placeholder="Id" value={deletedId} onChange={onDeletedIdChange}/>
             <button onClick={deletePlayer}>
                 DELETE
