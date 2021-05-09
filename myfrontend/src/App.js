@@ -8,14 +8,31 @@ function App() {
         headers: {'Access-Control-Allow-Origin': '*'}
     };
 
+    //Get
     const [name, setName] = useState('');
     const [surname, setSurname] = useState('');
+
+    //Post
     const [addedName, setAddedName] = useState('');
     const [addedSurname, setAddedSurname] = useState('');
-    const [overall, setOverall] = useState(0);
-    const [club, setClub] = useState('');
-    const [rare, setRare] = useState(false);
-    const [nationality, setNationality] = useState('');
+    const [addedOverall, setAddedOverall] = useState(0);
+    const [addedClub, setAddedClub] = useState('');
+    const [addedRare, setAddedRare] = useState(false);
+    const [addedNationality, setAddedNationality] = useState('');
+
+    //Delete
+    const [deleteName, setDeleteName] = useState('');
+    const [deleteSurname, setDeleteSurname] = useState('');
+
+    //Put
+    const [updatedName, setUpdatedName] = useState('');
+    const [updatedSurname, setUpdatedSurname] = useState('');
+    const [updatedOverall, setUpdatedOverall] = useState(0);
+    const [updatedClub, setUpdatedClub] = useState('');
+    const [updatedRare, setUpdatedRare] = useState(false);
+    const [updatedNationality, setUpdatedNationality] = useState('');
+
+    //Get
 
     const onNameChange = (event) => {
         setName(event.target.value);
@@ -24,6 +41,8 @@ function App() {
     const onSurnameChange = (event) => {
         setSurname(event.target.value);
     }
+
+    //Post
 
     const onAddedNameChange = (event) => {
         setAddedName(event.target.value);
@@ -34,19 +53,55 @@ function App() {
     }
 
     const onOverallChange = (event) => {
-        setOverall(event.target.value);
+        setAddedOverall(event.target.value);
     }
 
     const onClubChange = (event) => {
-        setClub(event.target.value);
+        setAddedClub(event.target.value);
     }
 
     const onRareChange = (event) => {
-        setRare(event.target.value);
+        setAddedRare(event.target.value);
     }
 
     const onNationalityChange = (event) => {
-        setNationality(event.target.value);
+        setAddedNationality(event.target.value);
+    }
+
+    //Delete
+
+    const onDeleteNameChange = (event) => {
+        setDeleteName(event.target.value);
+    }
+
+    const onDeleteSurnameChange = (event) => {
+        setDeleteSurname(event.target.value);
+    }
+
+    //Put
+
+    const onUpdatedNameChange = (event) => {
+        setUpdatedName(event.target.value);
+    }
+
+    const onUpdatedSurnameChange = (event) => {
+        setUpdatedSurname(event.target.value);
+    }
+
+    const onUpdatedOverallChange = (event) => {
+        setUpdatedOverall(event.target.value);
+    }
+
+    const onUpdatedClubChange = (event) => {
+        setUpdatedClub(event.target.value);
+    }
+
+    const onUpdatedRareChange = (event) => {
+        setUpdatedRare(event.target.value);
+    }
+
+    const onUpdatedNationalityChange = (event) => {
+        setUpdatedNationality(event.target.value);
     }
 
     const getPlayer = () => {
@@ -61,14 +116,36 @@ function App() {
         {
             name:        addedName,
             surname:     addedSurname,
-            overall:     overall,
-            rare:        rare,
-            club:        club,
-            nationality: nationality
+            overall:     addedOverall,
+            rare:        addedRare,
+            club:        addedClub,
+            nationality: addedNationality
         },config)
         .then(response => console.log(addedName + ' ' + addedSurname + ' was added to db'))
         .catch(error => console.log(error));
     }
+
+    const deletePlayer = () => {
+        axios.delete('http://localhost:8080/delete/'+name+'/'+surname+'',config)
+        .then(response => console.log(response.data))
+        .catch(error => console.log(error))
+    }
+
+    const updatePlayer = () => {
+        axios.post('http://localhost:8080/update/'+name+'/'+surname+'',config,
+        {
+            name:        updatedName,
+            surname:     updatedSurname,
+            overall:     updatedOverall,
+            rare:        updatedRare,
+            club:        updatedClub,
+            nationality: updatedNationality
+        },config)
+        .then(response => console.log(addedName + ' ' + addedSurname + ' was added to db'))
+        .catch(error => console.log(error));
+    }
+
+
     return (
         <div>
             {name+surname};
@@ -87,17 +164,47 @@ function App() {
             <br/>
             <input placeholder="Nazwisko" value={addedSurname} onChange={onAddedSurnameChange}/>
             <br/>
-            <input placeholder="Ocena" value={overall} onChange={onOverallChange}/>
+            <input placeholder="Ocena" value={addedOverall} onChange={onOverallChange}/>
             <br/>
-            <input type="checkbox" placeholder="Rzadkość" value={rare} onChange={onRareChange}/>
+            <input type="checkbox" placeholder="Rzadkość" value={addedRare} onChange={onRareChange}/>
             <br/>
-            <input placeholder="Club" value={club} onChange={onClubChange}/>
+            <input placeholder="Club" value={addedClub} onChange={onClubChange}/>
             <br/>
-            <input placeholder="Reprezentacja" value={nationality} onChange={onNationalityChange}/>
+            <input placeholder="Reprezentacja" value={addedNationality} onChange={onNationalityChange}/>
             <br/>
             <button onClick={addPlayer}>
                 POST
             </button>
+
+            <br></br>
+
+            <h3>Delete playar card by name and surname</h3>
+            <input placeholder="Imię" value={deleteName} onChange={onDeleteNameChange}/>
+            <input placeholder="Nazwisko" value={deleteSurname} onChange={onDeleteSurnameChange}/>
+            <button onClick={deletePlayer}>
+                DELETE
+            </button>
+
+            <br></br>
+
+            <h3>Update playar card</h3>
+            <input placeholder="Imię" value={updatedName} onChange={onUpdatedNameChange}/>
+            <br/>
+            <input placeholder="Nazwisko" value={updatedSurname} onChange={onUpdatedSurnameChange}/>
+            <br/>
+            <input placeholder="Ocena" value={updatedOverall} onChange={onUpdatedOverallChange}/>
+            <br/>
+            <input type="checkbox" placeholder="Rzadkość" value={updatedRare} onChange={onUpdatedRareChange}/>
+            <br/>
+            <input placeholder="Club" value={updatedClub} onChange={onUpdatedClubChange}/>
+            <br/>
+            <input placeholder="Reprezentacja" value={updatedNationality} onChange={onUpdatedNationalityChange}/>
+            <br/>
+            <button onClick={updatePlayer}>
+                UPDATE
+            </button>
+
+
         </div>
     );
 }

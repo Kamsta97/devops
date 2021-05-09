@@ -79,6 +79,32 @@ app.post("/createCard",jsonParser, (req,res) => {
     })
 })
 
+app.delete("delete/:name/:surname", cors(), (req,res) => {
+    var name = req.params.name;
+    var surname = req.params.surname;
+    try {
+        pgClient.query(`DELETE FROM cards WHERE name = '${name}' AND surname = '${surname}'`, (error, results) => {
+            if (error) {
+              throw error;
+            }
+            response.status(201).send(`Phone added with ID: ${id}`);
+          })
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+app.put("update/:name/:surname", cors(), (req,res) => {
+    const {name, surname, overall, rare, club, nationality} = req.body
+    pgClient.query('UPDATE cards SET name = $1, surname = $2, overall = $3, rare = $4, club = $5, nationality = $6', 
+    [name,surname,parseInt(overall),StringToBool(rare),club,nationality], (error, result) => {
+        if (error) {
+            throw error;
+        }
+        response.status(200).send(`${name} ${surname} was modified`)
+    });
+})
+
 app.get("/getCardById/:name/:surname",cors(), (req,res) => {
     var name = req.params.name;
     var surname = req.params.surname;
