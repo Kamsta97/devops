@@ -38,3 +38,10 @@ services:
           - ./:/opt/app 
       ports: 
           - "3000:3000"
+  mynginx:
+      restart: always
+      build:
+          dockerfile: dockerfile
+          context: ./mynginx
+      ports: 
+          - '9090:80'

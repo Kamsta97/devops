@@ -126,13 +126,13 @@ function App() {
     }
 
     const deletePlayer = () => {
-        axios.delete('http://localhost:8080/delete/'+name+'/'+surname+'',config)
+        axios.delete('http://localhost:8080/delete/'+deleteName+'/'+deleteSurname+'',config)
         .then(response => console.log(response.data))
         .catch(error => console.log(error))
     }
 
     const updatePlayer = () => {
-        axios.post('http://localhost:8080/update/'+name+'/'+surname+'',config,
+        axios.post('http://localhost:8080/update/'+updatedName+'/'+updatedSurname+'',config,
         {
             name:        updatedName,
             surname:     updatedSurname,
