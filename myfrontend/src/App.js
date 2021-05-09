@@ -132,7 +132,7 @@ function App() {
     }
 
     const updatePlayer = () => {
-        axios.post('http://localhost:8080/update/'+updatedName+'/'+updatedSurname+'',config,
+        axios.put('http://localhost:8080/update/'+updatedName+'/'+updatedSurname+'',config,
         {
             name:        updatedName,
             surname:     updatedSurname,
@@ -141,7 +141,7 @@ function App() {
             club:        updatedClub,
             nationality: updatedNationality
         },config)
-        .then(response => console.log(addedName + ' ' + addedSurname + ' was added to db'))
+        .then(response => console.log(updatedName + ' ' + updatedSurname + ' was added to db'))
         .catch(error => console.log(error));
     }
 

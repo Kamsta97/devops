@@ -87,7 +87,7 @@ app.delete("/delete/:name/:surname", cors(), (req,res) => {
             if (error) {
               throw error;
             }
-            response.status(201).send(`Card added with ID: ${id}`);
+            response.status(201).send(`${name} ${surname} was deleted`);
           })
     } catch (error) {
         console.log(error);
@@ -98,13 +98,13 @@ app.put("/update/:name/:surname", cors(), (req,res) => {
     const {name, surname, overall, rare, club, nationality} = req.body
     console.log(name);
     console.log(surname);
-    pgClient.query('UPDATE cards SET name = $1, surname = $2, overall = $3, rare = $4, club = $5, nationality = $6', 
+    pgClient.query('UPDATE cards SET overall = $3, rare = $4, club = $5, nationality = $6 where name = $1 and surname = $2', 
     [name,surname,parseInt(overall),StringToBool(rare),club,nationality], (error, result) => {
         if (error) {
             console.log(error);
             throw error;
         }
-        response.status(200).send(`${name} ${surname} was modified`)
+        response.status(200).send(`${name} ${surname} was updated`);
     });
 })
 
@@ -113,7 +113,7 @@ app.get("/getCardById/:name/:surname",cors(), (req,res) => {
     var surname = req.params.surname;
     redisClient.get(name+surname, async (err , data) => {
         console.log(data);
-        if (data != null && data != []) {
+        if (data.data) {
             return res.status(200).send({
                 error: false,
                 msg: `This data is from catch`,
