@@ -17,7 +17,7 @@ spec:
       containers:
         - name: mybackendlb-container
           image: kamsta97/mybackendlb
-  replicas: 5
+  replicas: 1
   selector:
     matchLabels:
       app: my-app
