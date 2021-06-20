@@ -100,14 +100,14 @@ function App() {
     }
 
     const getPlayer = () => {
-        axios.get('http://localhost:5000/getCardById/'+id+'' , config)
+        axios.get('http://localhost/api/getCardById/'+id+'' , config)
             .then(response => console.log(response.data))
             .catch(error => console.log(error))
     }
 
     const addPlayer = () => {
         console.log(addedRare);
-        axios.post('http://localhost:5000/createCard',
+        axios.post('http://localhost/api/createCard',
         {
             name:        addedName,
             surname:     addedSurname,
@@ -121,14 +121,14 @@ function App() {
     }
 
     const deletePlayer = () => {
-        axios.delete('http://localhost:5000/delete/'+deletedId+'',config)
+        axios.delete('http://localhost/api/delete/'+deletedId+'',config)
         .then(response => console.log(response.data))
         .catch(error => console.log(error))
     }
 
     const updatePlayer = () => {
         console.log(updatedRare);
-        axios.put('http://localhost:5000/update/'+updatedId+'',
+        axios.put('http://localhost/api/update/'+updatedId+'',
         {
             id:          updatedId,
             name:        updatedName,

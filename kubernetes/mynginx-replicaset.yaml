@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
-  name: my-nginx-replicaset
+  name: mynginx-replicaset
   labels:
     component: web
     app: my-app
@@ -9,14 +9,14 @@ metadata:
 spec:
   template:
     metadata:
-      name: my-nginx-pod
+      name: mynginx-pod
       labels:
         component: web
         app: my-app
     spec:
       containers:
-        - name: my-nginx-container
-          image: nginx:alpine
+        - name: mynginx-container
+          image: kamsta97/mynginx
   replicas: 5
   selector:
     matchLabels:

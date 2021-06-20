@@ -1,0 +1,57 @@
+SIEC------------------------
+docker network create nazwa
+docker network inspect id
+
+OGOLNE----------------------------
+1.Tworzymy image myredis i odrazu run
+2.Tworzymy image postgres
+2.Tworzymy sieć mynetwork(docker netwrok create mynetwork)
+3.docker run --name mypostgres --network=mynetwork -e POSTGRES_PASSWORD=admin123 -p 5432:5432 -d postgres
+4.docker network connect mynetwork myredis
+5.W katalogu backend robimy docker build . -t kstasiak/mybackend
+6.docker run --network=mynetwork --name mybackend -p 8080:8080 -d kstasiak/mybackend:latest
+7. docker-compose up -podnosi wspolny kontener ze wszystkimi apkami
+
+
+docker run
+--network - sieć
+--name    - nazwa contenera
+-p        - port
+-d        -z jakiego immage
+
+POSTGRES------------------------
+docker exec -it 7af101d74cfe sh
+su postgres
+psql
+
+\l - pokazuje wszystkie bazy danych
+\c nazwabazy - łączy z daną bazą danych
+\d - lista wszystkich tabel w bazie danych
+\conninfo - info o polaczeniu
+
+
+kubernetes:
+
+kubectl apply -f .\pv-local.yaml - tworzymy klaster
+kubectl describe pv pv-local - opis
+kubectl get pv - dostepne
+kubectl get pods
+kubectl get services
+kubectl logs nazwa
+
+usuwany najpierw deployment potem pody
+
+psql -U myappuser --password myappdb
+
+Po stworzeniu serwisu dajemy tą komende żeby widziało na porcie localhost:5432:
+kubectl port-forward mypostgres-deployment-5cc8cb77d-mhrm8 5432:5432
+
+Żeby połączyć kluster backend z klustrem postgres daje :
+kubectl get ep
+
+Patrze na nazwe dla postgresa i to daje do hosta i port ten co na ep
+
+
+
+
+

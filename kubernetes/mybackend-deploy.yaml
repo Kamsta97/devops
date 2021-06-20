@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mybackend-deployment
+  labels:
+    component: backend
+    app: my-app
+
+spec:
+  template:
+    metadata:
+      name: mybackend-pod
+      labels:
+        component: backend
+        app: my-app
+    spec:
+      containers:
+        - name: mybackend
+          image: kamsta97/mybackend
+          ports:
+            - containerPort: 5000
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: mypostgres-config
+                  key: PGPASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: mypostgres-config
+                  key: PGDATABASE
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: mypostgres-config
+                  key: PGUSER
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mypostgres-config
+                  key: PGHOST
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_HOST
+              value: myredis-clusterip
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+      component: backend

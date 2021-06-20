@@ -7,7 +7,6 @@ var { Client} = require('pg');
 
 const app = express();
 const appId = uuidv4();
-const appPort = 5000;
 
 //REDIS
 const redisClient = redis.createClient({
@@ -28,18 +27,15 @@ const pgClient = new Client({
     user: 'myappuser',
     password: 'admin123',
     database: 'myappdb', 
-    host: 'mypostgres-node-port',
+    host: 'mypostgres-clusterip',
     port: '5432'
 })
 
-console.log('afterConfig')
-
 pgClient.connect(err => {
-    console.log('inside connect');
     if (err) {
-      console.error('connection error', err.stack)
+      console.error('connection error', err.stack);
     } else {
-        console.log('connected')
+        console.log('connect to pg');
 
         pgClient.query(`
             CREATE TABLE IF NOT EXISTS cards
@@ -59,10 +55,119 @@ pgClient.connect(err => {
     }
 })
 
-app.get('/api', (req,res) => {
-    res.send(`[${appId}] Hello test`);
+//METHODS
+app.get("/", (req, res) => {
+    res.send("hello world");
+});
+
+app.post("/createCard",jsonParser, (req,res) => {
+    console.log(req.body.rare);
+    let query = `INSERT INTO cards (id,name,surname,overall,rare,club,nationality) VALUES (
+        '${uuidv4()}',
+        '${req.body.name}',
+        '${req.body.surname}',
+        ${parseInt(req.body.overall)},
+        ${req.body.rare},
+        '${req.body.club}',
+        '${req.body.nationality}')`
+    pgClient.query(query)
+    .then( () => {
+        console.log(`${req.body.name} ${req.body.surname} has been added to database`);
+        res.sendStatus(200);
+    })
+    .catch( (err) => {
+        console.log(err);
+        //throw err;
+    })
 })
 
-app.listen(appPort, err => {
-    console.log(`App listing on port ${appPort}`);
+app.delete("/delete/:id", cors(), (req,res) => {
+    var id = req.params.id;
+    try {
+        pgClient.query(`DELETE FROM cards WHERE id = '${id}'`, (error, results) => {
+            if (error) {
+                console.log(error);
+                throw error;
+            }
+            res.status(200).send(`Card: ${id} was deleted`);
+          })
+    } catch (error) {
+        console.log(error);
+        //throw error;
+    }
 })
+
+app.put("/update/:id", cors(), (req,res) => {
+    const {id,name, surname, overall, rare, club, nationality} = req.body
+    console.log(overall);
+    console.log(rare);
+    console.log(req.body);
+
+    redisClient.exists(id, (err, response) => {
+        if (response == 1) {
+            redisClient.setex(id, 600, JSON.stringify({
+                id: id,
+                name: name,
+                surname: surname,
+                overall: overall,
+                rare: rare,
+                club: club,
+                nationality: nationality
+            }));
+        }
+    });
+
+    pgClient.query(`UPDATE cards SET 
+    name='${name}',
+    overall = ${overall}, 
+    rare = ${rare}, 
+    club = '${club}', 
+    nationality = '${nationality}' 
+    where id = '${id}'`, 
+    (error, result) => {
+        if (error) {
+            console.log(error);
+            //throw error;
+        }
+        res.status(200).send(`Card ${name} ${surname} was updated`);
+    });
+})
+
+app.get("/getCardById/:id",cors(), (req,res) => {
+    var id = req.params.id;
+    redisClient.exists(id, (error, result) => {
+        if (error) {
+          console.log(error);
+          //throw error;
+        }
+    
+        if(result == 1) {
+          console.log("Data from redis");
+          redisClient.get(id, function(error, object) {
+            if(error) {
+                console.log(error);
+                //throw error;
+            }
+            res.status(200).json(JSON.parse(object));
+          })
+        } else {
+            console.log("Data from db")
+            pgClient.query(`SELECT * FROM cards WHERE id = '${id}'`)
+            .then( data => {
+                console.log(JSON.stringify(data.rows));
+                 redisClient.setex(id, 600, JSON.stringify(data.rows));
+                 res.status(200).json(data.rows)
+            })
+            .catch( err => {
+                console.log(err);
+                //throw err;
+            })
+          }
+    });
+})
+
+//PORT
+const PORT = 5000;
+app.listen(PORT, () => {
+    console.log(`API ${appId} listening on port `+PORT);
+});

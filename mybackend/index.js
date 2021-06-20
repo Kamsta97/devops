@@ -10,9 +10,8 @@ var jsonParser = bodyParser.json()
 //REDIS
 const redis = require('redis');
 const redisClient = redis.createClient({
-    host: 'myredis',
+    host: 'myredis-clusterip',
     port: 6379,
-   //retry_strategy: () => 1000
 })
 redisClient.on('error', (err) => {
     console.log(err)
@@ -24,10 +23,10 @@ redisClient.on('connect', () => {
 //POSTGRES
 var { Client} = require('pg');
 const pgClient = new Client({
-    user: 'postgres',
+    user: 'myappuser',
     password: 'admin123',
-    database: 'mytestdb',
-    host: 'mypostgres', //nazwa kontenera
+    database: 'myappdb', 
+    host: 'mypostgres-clusterip',
     port: '5432'
 })
 
@@ -35,7 +34,7 @@ pgClient.connect(err => {
     if (err) {
       console.error('connection error', err.stack)
     } else {
-        console.log('connected')
+        console.log('connect to pg')
 
         pgClient.query(`
             CREATE TABLE IF NOT EXISTS cards
@@ -102,6 +101,21 @@ app.put("/update/:id", cors(), (req,res) => {
     console.log(overall);
     console.log(rare);
     console.log(req.body);
+
+    redisClient.exists(id, (err, response) => {
+        if (response == 1) {
+            redisClient.setex(id, 600, JSON.stringify({
+                id: id,
+                name: name,
+                surname: surname,
+                overall: overall,
+                rare: rare,
+                club: club,
+                nationality: nationality
+            }));
+        }
+    });
+
     pgClient.query(`UPDATE cards SET 
     name='${name}',
     overall = ${overall}, 
@@ -151,20 +165,8 @@ app.get("/getCardById/:id",cors(), (req,res) => {
     });
 })
 
-
-
-function StringToBool(value){
-    res = false;
-    if(value == "true"){
-        res = true;
-    } else {
-        res = false;
-    }
-    return res;
-}
-
 //PORT
-const PORT = 4000;
+const PORT = 5000;
 app.listen(PORT, () => {
     console.log('API listening on port '+PORT);
 });
